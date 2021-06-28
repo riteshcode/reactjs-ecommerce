@@ -27,6 +27,16 @@
 .App-link {
   color: #61dafb;
 }
+.opencart{
+  display: block !important;
+}
+.openShipping{
+  display: block !important;
+  transition: cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+.errorInput{
+  border: 1px solid red !important;
+}
 
 @keyframes App-logo-spin {
   from {
