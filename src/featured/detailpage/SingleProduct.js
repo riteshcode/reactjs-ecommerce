@@ -1,14 +1,34 @@
-import React from 'react'
+import React, { useEffect,useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
+import axios from 'axios';
+import parse from 'html-react-parser';
+
+import { additemtocart } from '../../featured/cart/cart-slice'
+import { useDispatch } from 'react-redux';
+
 
 
 const SingleProduct = ()=> {
-    const { slug } = useParams();
+    
+    // console.log(process.env.REACT_APP_SERVER_URL)
 
+    
+    const dispatch = useDispatch();
+  
+    {/* cart add */}
+
+    const addToCart = (elem) =>{
+
+        dispatch(additemtocart(elem));
+    
+    }
+    const { slug } = useParams();
+    
+    const [product_detail, setProductDetail] = useState([])
     
     const settings = {
         slidesToShow: 1,
@@ -44,6 +64,18 @@ const SingleProduct = ()=> {
         {"breakpoint":479, "settings": {"slidesToShow": 1} }
     ];
 
+    useEffect(() => {
+        
+        axios.get(process.env.REACT_APP_SERVER_URL+'product/'+slug).then( (response)=>{
+            setProductDetail(response.data.data[0])
+            
+        }).catch( (error)=>{
+            console.log(error)
+        })
+
+    },[])
+
+
 
     return (
         <>
@@ -59,32 +91,32 @@ const SingleProduct = ()=> {
                                     <Slider {...settings} {...responsive}>
                                                         
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%/assets/img/products/big1-1.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-1.jpg" className="img-fluid" alt="" />
                                         </div>
                                         
                                                     
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%assets/img/products/big1-2.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-2.jpg" className="img-fluid" alt="" />
                                         </div>
                                         
                                                     
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%assets/img/products/big1-3.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-3.jpg" className="img-fluid" alt="" />
                                         </div>
                                         
                                                     
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%assets/img/products/big1-4.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-4.jpg" className="img-fluid" alt="" />
                                         </div>
                                         
                                                     
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%assets/img/products/big1-5.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-5.jpg" className="img-fluid" alt="" />
                                         </div>
                                         
                                                     
                                         <div className="big-image-slider-single-item">
-                                            <img src="%PUBLIC_URL%assets/img/products/big1-6.jpg" className="img-fluid" alt="" />
+                                            <img src="assets/img/products/big1-6.jpg" className="img-fluid" alt="" />
                                         </div>
                                     </Slider>
 
@@ -97,11 +129,11 @@ const SingleProduct = ()=> {
                                 <div className="small-image-slider-wrapper small-image-slider-wrapper--quickview">
                                     <div className="ht-slick-slider small-image-slider">
                                     
-                                    <Slider {...settings_2}>
+                                    {/* <Slider {...settings_2}> */}
                                         <div className="small-image-slider-single-item">
                                             <img src="assets/img/products/small1-1.jpg" className="img-fluid" alt="" />
                                         </div>
-                                    </Slider>
+                                    {/* </Slider> */}
 
                                     </div>
                                 </div>
@@ -122,7 +154,7 @@ const SingleProduct = ()=> {
                                     </ul>
                                 </div>
 
-                                <h3 className="product-details-title mb-15">Lorem ipsum indoor plants</h3>
+                                <h3 className="product-details-title mb-15">{product_detail.product_name}</h3>
                                 <div className="rating d-inline-block mr-15">
                                     <i className="ion-android-star active"></i>
                                     <i className="ion-android-star active"></i>
@@ -133,7 +165,20 @@ const SingleProduct = ()=> {
                                 <div className="review-links d-inline-block">
                                     <a href="#">(1 Review)</a> <span className="separator">|</span> <a href="#">Write A Review</a>
                                 </div>
-                                <p className="product-price product-price--big mb-10"><span className="discounted-price">$100.00</span> <span className="main-price discounted">$120.00</span></p>
+                                <p className="product-price product-price--big mb-10">
+                                    { product_detail.product_price_type=='single' &&
+                                        <>
+                                        <span className="discounted-price">${product_detail.product_price}</span>
+                                        <span className="main-price discounted">${product_detail.product_offer_price}</span>
+                                        </>
+                                    }
+                                    { product_detail.product_price_type=='bulk' &&
+                                        <>
+                                        <span className="discounted-price">${product_detail.product_price}</span>
+                                        <span className="main-price discounted">${product_detail.product_offer_price}</span>
+                                        </>
+                                    }    
+                                </p>
 
                                 <div className="product-info-block mb-30">
                                     <div className="single-info">
@@ -146,16 +191,16 @@ const SingleProduct = ()=> {
                                     </div>
                                     <div className="single-info">
                                         <span className="title">Product Code:</span>
-                                        <span className="value">abcd1234</span>
+                                        <span className="value">{product_detail.product_sku}</span>
                                     </div>
                                     <div className="single-info">
                                         <span className="title">Availability:</span>
-                                        <span className="value stock-red">In stock</span>
+                                        <span className="value stock-red">In stock({product_detail.product_stock})</span>
                                     </div>
                                 </div>
 
                                 <div className="product-short-desc mb-25">
-                                    <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptas consectetur inventore voluptatem dignissimos nemo repellendus est, harum maiores veritatis quidem.</p>
+                                    <p>{product_detail.product_short_description}</p>
                                 </div>
 
                                 <div className="quantity mb-20">
@@ -163,7 +208,7 @@ const SingleProduct = ()=> {
                                     <div className="pro-qty mr-15 mb-lg-20 mb-md-20 mb-sm-20">
                                         <input type="text" value="1" />
                                     </div>
-                                    <button className="theme-button product-cart-button">+ Add to Cart</button>
+                                    <button className="theme-button product-cart-button" onClick={ () =>addToCart(product_detail) }>+ Add to Cart</button>
                                 </div>
 
                                 <div className="compare-button d-inline-block mr-40">
@@ -254,9 +299,8 @@ const SingleProduct = ()=> {
                                         {/* <!--=======  product description  =======--> */}
                                         
                                         <div className="product-description">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam fringilla augue nec est tristique auctor. Donec non est at libero vulputate rutrum. Morbi ornare lectus quis justo gravida semper. Nulla tellus mi, vulputate adipiscing cursus eu, suscipit id nulla.</p>
-                                            
-                                            <p>Pellentesque aliquet, sem eget laoreet ultrices, ipsum metus feugiat sem, quis fermentum turpis eros eget velit. Donec ac tempus ante. Fusce ultricies massa massa. Fusce aliquam, purus eget sagittis vulputate, sapien libero hendrerit est, sed commodo augue nisi non neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor, lorem et placerat vestibulum, metus nisi posuere nisl, in accumsan elit odio quis mi. Cras neque metus, consequat et blandit et, luctus a nunc. Etiam gravida vehicula tellus, in imperdiet ligula euismod eget.</p>
+                                        {/* { parse(product_detail.product_description) } */}
+                                        { product_detail.product_description }
                                         </div>
                                         
                                         {/* <!--=======  End of product description  =======--> */}

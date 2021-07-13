@@ -8,8 +8,14 @@ const Thankyou = ()=> {
         <>
             <div className="container">
                 <div className="row">
-                    <h1>Thank You For Purchasing</h1>
-                    <h1>Your Order id:  {order_id}</h1>
+                    <div className="col-md-12 text-center">
+                        <div>
+                            <i class="icon-x-circle success-icon" ></i>
+                        </div>
+                        <br/>
+                        <h4>Thank You For Purchasing</h4>
+                        <h1>Your Order id -  #{order_id}</h1>
+                    </div>
                 </div>
             </div>
         </>

@@ -14,7 +14,7 @@ function Home() {
 
     useEffect(() => {
         
-        axios.get('http://127.0.0.1:8000/api/product').then( (response)=>{
+        axios.get(process.env.REACT_APP_SERVER_URL+'product').then( (response)=>{
             console.log(response.data.data)
             setProductList(response.data.data)
         }).catch( (error)=>{

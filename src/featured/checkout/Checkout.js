@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Redirect, useHistory } from "react-router-dom";
 import { notify } from "../../component/common/ToastNotification";
-import {getCartList} from '../../featured/cart/cart-slice'
+import {getCartList} from '../../featured/cart/cart-slice';
 
 function Checkout() {
     let history = useHistory();
@@ -39,7 +39,7 @@ function Checkout() {
     const [isShippingDiff, setisShippingDiff] = useState(true)
 
     const ToggleShipping = ()=>{
-        console.log(isShippingDiff);
+        
         if(isShippingDiff){
             document.getElementById('shipping-form').classList.add('openShipping');
             setisShippingDiff(false)
@@ -60,7 +60,7 @@ function Checkout() {
     useEffect(() => {
         let total = 0;
         cartitem.filter((cart)=>{
-        return total += parseInt(cart.selling_price) * parseInt(cart.pqty)
+        return total += parseInt(cart.product_price) * parseInt(cart.pqty)
         })
         setCartTotal(total)
     }, [cartitem])
@@ -79,39 +79,90 @@ function Checkout() {
         console.log(shippingData);
         
     }
+
+    function printError(elemId, hintMsg) {
+        document.getElementById(elemId).innerHTML = hintMsg;
+    }
+
+    function box_red(htmlid,type){
+        if(type == 'add')
+            document.getElementsByName(htmlid)[0].classList.add('errorInput');
+        else
+            document.getElementsByName(htmlid)[0].classList.remove('errorInput');
+    
+    }
+
+
+/*
+place order function
+
+*/
+
     const placeOrder = (event) =>{
         event.preventDefault();
-        // <Redirect to="'/" />
-        // history.push('/thankyou/hHHHH&&');
-        // console.log(shippingData);
-        // for (let i in shippingData) {
-        //     console.log(i);
-        //     console.log(shippingData[i]);
-        //     document.getElementsByName(i)[0].classList.add('errorInput')
 
-            
-        // }
+        /* adding validation empty condition check logic here */
+
+        let error_status = [];
+        var i=1;
+        for (let key in shippingData){
+            if(shippingData.hasOwnProperty(key)){
+
+                if(key == 'shipping_diff'){
+                    if(shippingData[key]==false)
+                        break;
+                
+                }else{
+
+                    if(shippingData[key] == ''){
+                        console.log(key+' empyt - '+shippingData[key]);
+                        box_red(key,'add')
+                        printError(key+'_err','Please enter '+key);
+                        error_status[i++] = false;
+                    }else{
+                        error_status[i++] = true;
+                    }
+                    
+                }
+                console.log(`${key} : ${shippingData[key]}`)
+            }
+        }
+
+        // if any field not fill stop the form submit excution
+
+        var found = error_status.find(function(value){
+            return value==false;
+        })
+        
+        if(found == false){         
+            return false;
+        }
+
+        
         shippingData.product = cartitem;
         
-
-        axios.post('http://127.0.0.1:8000/api/place_order',shippingData)
+        axios.post(process.env.REACT_APP_SERVER_URL+'place_order',shippingData)
             .then((res)=>{
                 console.log(res)
                 if(res.data.status){
                     let order_id = res.data.order_id;
-                    notify('Your order created: '+order_id+'','success');
-                    // window.location = ;
-                    // history.push('/thankyou/'+order_id);
+
+                    if(shippingData.payment_method == 'paytm')
+                        history.push('/payment/paytm/'+order_id);
+                    
                 }
             })
             .catch((error)=>{
                 console.log(error);
-                console.log('error')
+                notify('Some technical issue !','warning');
+                    
             });
 
                     
 
     }
+
+    /* end place order  */
 
     return (
         <>
@@ -133,20 +184,26 @@ function Checkout() {
                                             <label>First Name*</label>
                                             <input type="text" placeholder="First Name" className="" name="billing_fname" onChange={ 
                                                 (e) => {
+                                                    box_red('billing_fname','')
+                                                    printError('billing_fname_err','');
                                                     shippingData.billing_fname = e.target.value;
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_fname_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
                                             <label>Last Name*</label>
                                             <input type="text" placeholder="Last Name" name="billing_lname"  onChange={ 
                                                 (e) => {
+                                                    box_red('billing_lname','remove')
+                                                    printError('billing_lname_err','');
                                                     shippingData.billing_lname = e.target.value;
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_lname_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -157,6 +214,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_email_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -167,6 +225,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } /> 
+                                            <div class="errorInputText" id="billing_phone_err"></div>
                                         </div>
     
                                         <div className="col-12 mb-20">
@@ -177,6 +236,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_company_err"></div>
                                         </div>
     
                                         <div className="col-12 mb-20">
@@ -187,12 +247,15 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             }/>
+                                            <div class="errorInputText" id="billing_add1_err"></div>
+
                                             <input type="text" placeholder="Address line 2"  name="billing_add2" onChange={ 
                                                 (e) => {
                                                     shippingData.billing_add2 = e.target.value;
                                                     setshippingData(shippingData);
                                                 } 
                                             }/>
+                                            <div class="errorInputText" id="billing_add2_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -209,6 +272,7 @@ function Checkout() {
                                                 <option>India</option>
                                                 <option>Japan</option>
                                             </select>
+                                            <div class="errorInputText" id="billing_country_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -219,6 +283,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_city_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -229,6 +294,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_state_err"></div>
                                         </div>
     
                                         <div className="col-md-6 col-12 mb-20">
@@ -239,6 +305,7 @@ function Checkout() {
                                                     setshippingData(shippingData);
                                                 } 
                                             } />
+                                            <div class="errorInputText" id="billing_zipcode_err"></div>
                                         </div>
     
                                         <div className="col-12 mb-20">
@@ -333,7 +400,7 @@ function Checkout() {
                                             
                                             <ul>
                                                 {cartitem.map((cart, index) => (
-                                                    <li>{cart.product_name} X {cart.pqty} <span>${cart.selling_price * cart.pqty}</span></li>
+                                                    <li>{cart.product_name} X {cart.pqty} <span>${cart.product_price * cart.pqty}</span></li>
                                                 ))}
                                             
                                             </ul>
@@ -387,13 +454,13 @@ function Checkout() {
                                             </div>
                                             
                                             <div className="single-method">
-                                                <input type="radio" id="payment_paypal" name="payment_method" value="paypal" onChange={ 
+                                                <input type="radio" id="payment_paypal" name="payment_method" value="paytm" onChange={ 
                                                     (e) => {
                                                         shippingData.payment_method = e.target.value;
                                                         setshippingData(shippingData);
                                                     } 
                                                 }/>
-                                                <label for="payment_paypal">Paypal</label>
+                                                <label for="payment_paypal">Paytm</label>
                                                 <p data-method="paypal">Please send a Check to Store name with Store Street, Store Town, Store State, Store Postcode, Store Country.</p>
                                             </div>
                                             
@@ -407,12 +474,7 @@ function Checkout() {
                                                 <label for="payment_payoneer">Payoneer</label>
                                                 <p data-method="payoneer">Please send a Check to Store name with Store Street, Store Town, Store State, Store Postcode, Store Country.</p>
                                             </div>
-                                            
-                                            <div className="single-method">
-                                                <input type="checkbox" id="accept_terms" />
-                                                <label for="accept_terms">I’ve read and accept the terms & conditions</label>
-                                            </div>
-                                            
+                                             
                                         </div>
                                         
                                         <button className="place-order">Place order</button>

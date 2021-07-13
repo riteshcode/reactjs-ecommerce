@@ -18,7 +18,7 @@ const CartProduct = () => {
   useEffect(() => {
     let total = 0;
     cartitem.filter((cart)=>{
-      return total += parseInt(cart.selling_price) * parseInt(cart.pqty)
+      return total += parseInt(cart.product_price) * parseInt(cart.pqty)
     })
     setCartTotal(total)
   }, [cartitem])
@@ -51,7 +51,7 @@ const CartProduct = () => {
                                           <td className="pro-thumbnail"><a href="single-product.html">
                                             <img src={cart.product_image} className="img-fluid" alt="Product" /></a></td>
                                           <td className="pro-title"><a href="single-product.html">{cart.product_name}</a></td>
-                                          <td className="pro-price"><span>${cart.selling_price}</span></td>
+                                          <td className="pro-price"><span>${cart.product_price}</span></td>
                                           <td className="pro-quantity">
                                             <div className="pro-qty">
                                             <span className="btn btn-sm btn-danger" onClick={ ()=>dispatch(decrementItemQty(cart.sku)) }>-</span>
@@ -60,7 +60,7 @@ const CartProduct = () => {
                                             
                                             </div>
                                           </td> 
-                                          <td className="pro-subtotal"><span>${cart.selling_price * cart.pqty}</span></td>
+                                          <td className="pro-subtotal"><span>${cart.product_price * cart.pqty}</span></td>
                                           <td className="pro-remove">
                                             <span href="#" onClick={()=>deleteItem(cart.sku)}><i className="fa fa-trash-o"></i></span>
                                           </td>

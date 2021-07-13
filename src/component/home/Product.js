@@ -21,8 +21,8 @@ function Product(props) {
         dispatch(additemtocart(elem));
     
     }
-
-    const { product_name,selling_price,id,product_image } = props.data
+    console.log(props.data);
+    const { product_name,product_price,id,product_image,product_slug } = props.data
     
     return (
         <>
@@ -30,7 +30,7 @@ function Product(props) {
                             
                             <div className="single-slider-product grid-view-product">
                                 <div className="single-slider-product__image">
-                                    <NavLink to={`/product/${id}`}>
+                                    <NavLink to={`/product/${product_slug}`}>
                                         <img src={product_image} className="img-fluid" alt="" />
                                     </NavLink>
 
@@ -47,7 +47,7 @@ function Product(props) {
                                 
                                 <div className="single-slider-product__content">
                                     <p className="product-title">
-                                        <NavLink to={`/product/${id}`}>
+                                        <NavLink to={`/product/${product_slug}`}>
                                             {product_name}
                                         </NavLink>
                                     </p>
@@ -58,7 +58,7 @@ function Product(props) {
                                         <i className="ion-android-star active"></i>
                                         <i className="ion-android-star"></i>
                                     </div>
-                                    <p className="product-price"><span className="discounted-price">${selling_price}</span> <span className="main-price discounted">${selling_price}</span></p>
+                                    <p className="product-price"><span className="discounted-price">${product_price}</span> <span className="main-price discounted">${product_price}</span></p>
 
                                     <span className="cart-icon"><a  onClick={ () =>addToCart(props.data) }><i className="icon-shopping-cart"></i></a></span>
                                 </div>

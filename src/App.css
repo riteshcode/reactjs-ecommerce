@@ -37,6 +37,14 @@
 .errorInput{
   border: 1px solid red !important;
 }
+.errorInputText{
+  color: red;
+  margin-top: -10px;
+  font-size: 12px;
+}
+.success-icon{
+  font-size: 13rem; color: #009b00;
+}
 
 @keyframes App-logo-spin {
   from {
